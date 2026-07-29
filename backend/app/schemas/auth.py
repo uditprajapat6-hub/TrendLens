@@ -31,3 +31,22 @@ class UserPublic(BaseModel):
     xp: int = 0
     level: int = 1
     created_at: str
+
+from pydantic import BaseModel
+
+
+class ChangePasswordRequest(BaseModel):
+    currentPassword: str
+    newPassword: str
+
+
+class UpdateProfileRequest(BaseModel):
+    name: str
+    email: EmailStr
+
+from pydantic import BaseModel, EmailStr
+
+
+class UpdateProfileRequest(BaseModel):
+    name: str
+    email: EmailStr

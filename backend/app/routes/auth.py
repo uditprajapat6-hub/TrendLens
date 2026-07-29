@@ -13,7 +13,14 @@ from app.core.security import (
 )
 from app.database import get_database
 from app.models.user import new_user_document, user_to_public
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserPublic
+from app.schemas.auth import (
+    LoginRequest,
+    RegisterRequest,
+    TokenResponse,
+    UserPublic,
+    ChangePasswordRequest,
+    UpdateProfileRequest,
+)
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -58,3 +65,53 @@ async def login(payload: LoginRequest):
 @router.get("/me", response_model=UserPublic)
 async def read_current_user(current_user: dict = Depends(get_current_user)):
     return user_to_public(current_user)
+
+
+@router.put("/change-password")
+async def change_password(
+    payload: ChangePasswordRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    db = get_database()
+
+    if not verify_password(
+        payload.currentPassword,
+        current_user["hashed_password"],
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+
+    new_hashed = hash_password(payload.newPassword)
+
+    await db.users.update_one(
+        {"_id": current_user["_id"]},
+        {
+            "$set": {
+                "hashed_password": new_hashed,
+            }
+        },
+    )
+
+    return {"message": "Password changed successfully"}
+
+
+@router.put("/update-profile")
+async def update_profile(
+    payload: UpdateProfileRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    db = get_database()
+
+    await db.users.update_one(
+        {"_id": current_user["_id"]},
+        {
+            "$set": {
+                "name": payload.name,
+                "email": payload.email.lower(),
+            }
+        },
+    )
+
+    return {"message": "Profile updated successfully"}
