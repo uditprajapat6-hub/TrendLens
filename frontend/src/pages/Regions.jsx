@@ -1,10 +1,9 @@
 import Sidebar from "../components/Sidebar";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import FullScreenMap from "../components/regions/FullScreenMap";
-import TopCountriesTable from "../components/regions/TopCountriesTable";
-
-const API_URL = "http://localhost:8000";
+import FullScreenMap from "../components/Regions/FullScreenMap";
+import TopCountriesTable from "../components/Regions/TopCountriesTable";
+const API_URL = "https://trendlens-1.onrender.com";
 
 const continents = [
   "All",
