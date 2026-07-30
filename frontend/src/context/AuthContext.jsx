@@ -49,9 +49,23 @@ export function AuthProvider({ children }) {
     window.localStorage.removeItem('trendlens-refresh-token')
     setUser(null)
   }
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider
+  value={{
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    updateUser,
+    loadCurrentUser,
+    isAuthenticated: !!user,
+  }}
+>
       {children}
     </AuthContext.Provider>
   )

@@ -1,24 +1,23 @@
 import { Link, useLocation } from "react-router-dom";
 import {
-  FiGrid,
-  FiSearch,
-  FiGlobe,
-  FiAward,
-  FiBookOpen,
-  FiSettings,
-  FiBarChart2,
-} from "react-icons/fi";
+    FiGrid,
+    FiSearch,
+    FiGlobe,
+    FiAward,
+    FiSettings,
+    FiBarChart2,
+  } from "react-icons/fi";
 
 const items = [
-  { icon: FiGrid, label: "Overview", to: "/dashboard" },
+  
   { icon: FiSearch, label: "Keyword Analysis", to: "/dashboard" },
   { icon: FiBarChart2, label: "Compare", to: "/compare" },
 
 
 
   { icon: FiGlobe, label: "Regions", to: "/regions" },
-  { icon: FiAward, label: "Gamification", to: "/gamification" },
-  { icon: FiBookOpen, label: "Learning Hub", to: "/learning" },
+  
+  
   { icon: FiSettings, label: "Settings", to: "/settings" },
 ];
 

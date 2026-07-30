@@ -16,18 +16,28 @@ import StatCard from "../components/StatCard";
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
-
+import exportReport from "../utils/exportReport";
 
 function Skeleton({ className }) {
   return <div className={`skeleton ${className}`} />
 }
 
 export default function Dashboard() {
-  
+    const handleExport = () => {
+        exportReport({
+          keyword,
+          regions,
+        });
+      };
 
   const { user } = useAuth()
-  const [keyword, setKeyword] = useState("")
-  const [searchKeyword, setSearchKeyword] = useState("")
+  const [keyword, setKeyword] = useState(
+    localStorage.getItem("keyword") || ""
+  );
+  
+  const [searchKeyword, setSearchKeyword] = useState(
+    localStorage.getItem("keyword") || ""
+  );
   const [loading, setLoading] = useState(true)
   const [series, setSeries] = useState([])
   const [regions, setRegions] = useState([])
@@ -41,11 +51,15 @@ const peakInterest =
   series.length > 0
     ? Math.max(...series.map((item) => item.value))
     : 0
-
     const topRegion =
-    [...regions].sort((a, b) => b.score - a.score)[0]?.region || "-"
-
-const topQuery = related.top.length > 0 ? related.top[0].query : "-"
+    regions.length > 0
+      ? [...regions].sort((a, b) => b.score - a.score)[0].region
+      : "No regional data";
+  
+  const topQuery =
+    related?.top?.length > 0
+      ? related.top[0].query
+      : "No related queries";
   const [recentSearches, setRecentSearches] = useState([])
   const [searchStats, setSearchStats] = useState([])
   const deleteSearch = async (keyword) => {
@@ -72,44 +86,60 @@ const topQuery = related.top.length > 0 ? related.top[0].query : "-"
         console.error(err);
       }
     };
+      
   
     fetchOverview();
   }, []);
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
+    const savedKeyword = localStorage.getItem("keyword");
   
-        const [
-          interestRes,
-          regionRes,
-          relatedRes,
-        ] = await Promise.all([
-          api.get(`/dashboard/interest?keyword=${searchKeyword}&days=90`),
-          api.get(`/dashboard/regions?keyword=${searchKeyword}`),
-          api.get(`/dashboard/related?keyword=${searchKeyword}`),
-        
-        ])
-        setSeries(interestRes.data.series)
-        console.log(interestRes.data)
-        setRegions(regionRes.data.regions)
-        setRelated(relatedRes.data)
-        console.log(searchStatsRes.data)
-      }catch (err) {
-        console.error("Interest request failed:");
-        console.error(err);
-        console.error(err.response);
-        console.error(err.response?.data);
-      } finally {
-        setLoading(false)
-      }
+    if (savedKeyword && savedKeyword !== searchKeyword) {
+      setKeyword(savedKeyword);
+      setSearchKeyword(savedKeyword);
     }
-  
-    if (searchKeyword.trim()) {
-      fetchData()
-    }
-  }, [searchKeyword])
-
+  }, []);
+  useEffect(() => {
+    
+        const fetchData = async () => {
+          setLoading(true);
+      
+          try {
+            const interestRes = await api.get(
+              `/dashboard/interest?keyword=${searchKeyword}&days=90`
+            );
+            setSeries(interestRes.data.series);
+          } catch (err) {
+            console.error("Interest API failed", err);
+            setSeries([]);
+          }
+      
+          try {
+            const regionRes = await api.get(
+              `/dashboard/regions?keyword=${searchKeyword}`
+            );
+            setRegions(regionRes.data.regions);
+          } catch (err) {
+            console.error("Regions API failed", err);
+            setRegions([]);
+          }
+      
+          try {
+            const relatedRes = await api.get(
+              `/dashboard/related?keyword=${searchKeyword}`
+            );
+            setRelated(relatedRes.data);
+          } catch (err) {
+            console.error("Related API failed", err);
+            setRelated({ top: [], rising: [] });
+          }
+      
+          setLoading(false);
+        };
+      
+        if (searchKeyword.trim()) {
+          fetchData();
+        }
+      }, [searchKeyword]);
   const growthPct = useMemo(() => {
     if (series.length < 2) return 0
     const first = series[0].value
@@ -131,28 +161,45 @@ const topQuery = related.top.length > 0 ? related.top[0].query : "-"
               Level {user?.level ?? 1} · {user?.xp ?? 0} XP
             </p>
           </div>
-          <button className="btn-secondary text-sm !py-2">
-            <FiDownload size={15} /> Export report
-          </button>
+          <button
+  onClick={handleExport}
+  className="btn-secondary"
+>
+  Export report
+</button>
         </div>
 
         <form
-           onSubmit={(e) => {
-            e.preventDefault()
-          
-            if (!keyword.trim()) return
-          
-            setSearchKeyword(keyword.trim())
-          }}
-          className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-darkmuted p-2 max-w-md mb-8"
-        >
+  onSubmit={(e) => {
+    e.preventDefault();
+
+    if (!keyword.trim()) return;
+
+    localStorage.setItem("keyword", keyword.trim());
+    setSearchKeyword(keyword.trim());
+  }}
+  className="glass-panel flex items-center gap-3 p-3 mb-8"
+>
           <FiSearch className="ml-3 text-slate-400" />
           <input
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            className="flex-1 bg-transparent px-1 py-2 text-sm outline-none"
-            placeholder="(e.g. electric vehicles)"
-          />
+  value={keyword}
+  onChange={(e) => setKeyword(e.target.value)}
+  onKeyDown={(e) => {
+    console.log(e.key);
+
+    if (e.key === "Enter") {
+        e.preventDefault();
+      
+        if (!keyword.trim()) return;
+      
+        localStorage.setItem("keyword", keyword.trim());
+      
+        setSearchKeyword(keyword.trim());
+      }
+  }}
+  className="flex-1 bg-transparent px-1 py-2 text-sm outline-none"
+  placeholder="(e.g. electric vehicles)"
+/>
         <div className="flex gap-2">
   <button
     type="submit"
@@ -189,9 +236,11 @@ const topQuery = related.top.length > 0 ? related.top[0].query : "-"
   <button
     key={item._id || item.searched_at}
     onClick={() => {
-      setKeyword(item.keyword)
-      setSearchKeyword(item.keyword)
-    }}
+        localStorage.setItem("keyword", item.keyword);
+      
+        setKeyword(item.keyword);
+        setSearchKeyword(item.keyword);
+      }}
     className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm"
   >
     <span>{item.keyword}</span>
@@ -218,7 +267,7 @@ const topQuery = related.top.length > 0 ? related.top[0].query : "-"
 </div>
 
 
-       
+<div id="analytics-section">  
 
         <div className="grid lg:grid-cols-2 gap-5">
           <div className="glass-panel p-5">
@@ -326,7 +375,7 @@ content={({ active, payload, label }) => {
 </h3>
 
 <ul className="space-y-2">
-  {related.top.slice(0, 10).map((item, index) => (
+{(related?.top ?? []).slice(0, 10).map((item, index) => (
     <li
       key={index}
       className="flex justify-between border-b border-slate-200 pb-2"
@@ -343,7 +392,7 @@ content={({ active, payload, label }) => {
 </h3>
 
 <ul className="space-y-2">
-  {related.rising.slice(0, 10).map((item, index) => (
+{(related?.rising ?? []).slice(0, 10).map((item, index) => (
     <li
       key={index}
       className="flex justify-between border-b border-slate-200 pb-2"
@@ -356,7 +405,8 @@ content={({ active, payload, label }) => {
 
   </>
 )}
-</div>
+                      </div>
+                      </div>
         </div>
         <div className="glass-panel p-5 mt-6">
   <h3 className="font-display font-semibold mb-4">

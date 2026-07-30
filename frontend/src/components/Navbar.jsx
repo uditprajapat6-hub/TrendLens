@@ -4,12 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import ThemeToggle from './ThemeToggle'
 
-const links = [
-  { to: '/#dashboard-preview', label: 'Dashboard' },
-  { to: '/#learning-hub', label: 'Learning Hub' },
-  { to: '/#games', label: 'Games' },
-  { to: '/#faq', label: 'FAQ' },
-]
+
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -26,19 +21,13 @@ export default function Navbar() {
           Trendlens
         </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
-          {links.map((l) => (
-            <a key={l.label} href={l.to} className="transition-colors hover:text-brand-blue">
-              {l.label}
-            </a>
-          ))}
-        </div>
+    
 
         <div className="hidden md:flex items-center gap-3">
           <ThemeToggle />
           {isAuthenticated ? (
             <>
-              <Link to="/dashboard" className="btn-secondary !px-5 !py-2 text-sm">Dashboard</Link>
+              
               <button
                 onClick={() => { logout(); navigate('/') }}
                 className="btn-primary !px-5 !py-2 text-sm"
@@ -65,11 +54,7 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden flex flex-col gap-4 border-t border-slate-200 dark:border-slate-800 px-6 py-6">
-          {links.map((l) => (
-            <a key={l.label} href={l.to} onClick={() => setOpen(false)} className="text-sm font-medium">
-              {l.label}
-            </a>
-          ))}
+       
           <div className="flex items-center gap-3 pt-2">
             <ThemeToggle />
             {isAuthenticated ? (

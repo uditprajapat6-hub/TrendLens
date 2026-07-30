@@ -7,7 +7,10 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './routes/ProtectedRoute'
 import Compare from "./pages/Compare";
-
+import Regions from "./pages/Regions";
+import Settings from "./pages/Settings";
+import ChangePassword from "./pages/ChangePassword";
+import EditProfile from "./pages/EditProfile";
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -18,6 +21,14 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/compare" element={<Compare />} />
+                  <Route path="/regions" element={<Regions />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/edit-profile" element={<EditProfile />} />
+                  
+                  <Route
+  path="/change-password"
+  element={<ChangePassword />}
+/>
           <Route
             path="/dashboard"
             element={

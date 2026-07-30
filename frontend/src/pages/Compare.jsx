@@ -33,16 +33,19 @@ export default function Compare() {
   const [keyword1, setKeyword1] = useState("");
     const [keyword2, setKeyword2] = useState("");
     const [compareData, setCompareData] = useState(null);
-    const [days, setDays] = useState(90);
+    const [days, setDays] = useState(
+        Number(localStorage.getItem("timeRange")) || 90
+      );
     const [loading, setLoading] = useState(false);
     const [recentComparisons, setRecentComparisons] = useState([]);
     const handleCompare = async () => {
         console.log("Button clicked");
-      
+        
         if (!keyword1.trim() || !keyword2.trim()) {
-          alert("Enter both keywords");
-          return;
+            alert("Enter both keywords");
+            return;
         }
+        
       
         setLoading(true);
       
@@ -51,7 +54,8 @@ export default function Compare() {
             `/dashboard/compare?keywords=${encodeURIComponent(
               `${keyword1},${keyword2}`
             )}&days=${days}`
-          );
+            );
+            console.log(data);
       
             setCompareData(data);
             const updated = [
@@ -501,207 +505,8 @@ Compare Search Trends
     </span>
   </div>
 </div>
-<div className="bg-slate-950 rounded-2xl border border-slate-700 p-6">
 
-        <ResponsiveContainer width="100%" height={550}>
-
-<AreaChart
-data={compareData.data}
-margin={{
-    top: 20,
-    right: 30,
-    left: 10,
-    bottom: 10,
-}}
->
-<CartesianGrid
-stroke="#334155"
-strokeDasharray="2 6"
-opacity={0.22}
-/><defs>
-  <filter id="blueGlow" x="-100%" y="-100%" width="300%" height="300%">
-    <feGaussianBlur stdDeviation="6" result="blur" />
-    <feMerge>
-      <feMergeNode in="blur" />
-      <feMergeNode in="SourceGraphic" />
-    </feMerge>
-  </filter>
-
-  <filter id="redGlow" x="-100%" y="-100%" width="300%" height="300%">
-    <feGaussianBlur stdDeviation="6" result="blur" />
-    <feMerge>
-      <feMergeNode in="blur" />
-      <feMergeNode in="SourceGraphic" />
-    </feMerge>
-  </filter>
-
-  <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.45}/>
-    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0}/>
-  </linearGradient>
-
-  <linearGradient id="redGradient" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stopColor="#FF4D6D" stopOpacity={0.45}/>
-    <stop offset="100%" stopColor="#FF4D6D" stopOpacity={0}/>
-  </linearGradient>
-</defs>
-<XAxis
-  dataKey="date"
-  tick={{ fill: "#cbd5e1", fontSize: 12 }}
-  tickLine={false}
-  axisLine={{ stroke: "#475569" }}
-/>
-<YAxis
-  tick={{ fill: "#cbd5e1", fontSize: 12 }}
-  tickLine={false}
-  axisLine={{ stroke: "#475569" }}
-/>
-<Tooltip
-cursor={{
-    stroke:"#93C5FD",
-    strokeWidth:2,
-    strokeDasharray:"6 6"
-}}
-content={({ active, payload, label }) => {
-  if (!active || !payload || !payload.length) return null;
-
-  return (
-    <div
-      style={{
-        background:
-          "linear-gradient(135deg, #3b82f6 0%, #1e3a8a 45%, #0f172a 100%)",
-        border: "1px solid #60a5fa",
-        borderRadius: "12px",
-        padding: "12px 16px",
-        boxShadow: "0 15px 35px rgba(0,0,0,0.65)",
-        color: "#fff",
-      }}
-    >
-      <p style={{ fontWeight: "bold", marginBottom: 10 }}>
-        {label}
-      </p>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          color: "#3B82F6",
-          fontWeight: 600,
-          marginBottom: 6,
-        }}
-      >
-        <span>●</span>
-        <span>{payload[0].name}:</span>
-        <span style={{ color: "#fff" }}>{payload[0].value}</span>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          color: "#EF4444",
-          fontWeight: 600,
-        }}
-      >
-        <span>●</span>
-        <span>{payload[1].name}:</span>
-        <span style={{ color: "#fff" }}>{payload[1].value}</span>
-      </div>
-    </div>
-  );
-}}
-/>
-                            
-<Area
-type="natural"
-dataKey={compareData.keywords[0]}
-fill="url(#blueGradient)"
-stroke="transparent"
-/>
-
-<Line
-type="natural"
-dataKey={compareData.keywords[0]}
-stroke="#3B82F6"
-strokeWidth={10}
-strokeOpacity={0.18}
-dot={{
-    r:2,
-    fill:"#ffffff",
-    stroke:"#60A5FA",
-    strokeWidth:1,
-}}
-activeDot={false}
-/>
-
-<Line
-type="natural"
-dataKey={compareData.keywords[0]}
-stroke="#60A5FA"
-strokeWidth={3}
-dot={{
-    r:2,
-    fill:"#ffffff",
-    stroke:"#60A5FA",
-    strokeWidth:1,
-}}
-strokeLinecap="round"
-strokeLinejoin="round"
-activeDot={{
-    r: 6,
-    fill: "#ffffff",
-    stroke: "#60A5FA",
-    strokeWidth: 3,
-}}
-/>
-
-<Area
-    type="natural"
-    dataKey={compareData.keywords[1]}
-    fill="url(#redGradient)"
-    stroke="transparent"
-/>
-<Line
-type="natural"
-dataKey={compareData.keywords[1]}
-stroke="#EF4444"
-strokeWidth={10}
-strokeOpacity={0.18}
-dot={{
-    r:2,
-    fill:"#ffffff",
-    stroke:"#FF4D6D",
-    strokeWidth:1,
-}}
-activeDot={false}
-/>
-
-<Line
-type="natural"
-dataKey={compareData.keywords[1]}
-stroke="#FF4D6D"
-strokeWidth={3}
-dot={{
-    r:2,
-    fill:"#ffffff",
-    stroke:"#FF4D6D",
-    strokeWidth:1,
-}}
-strokeLinecap="round"
-strokeLinejoin="round"
-activeDot={{
-    r: 6,
-    fill: "#ffffff",
-    stroke: "#FF4D6D",
-    strokeWidth: 3,
-}}
-/>
-    </AreaChart>
-    </ResponsiveContainer>
-                                  </div>
-                                  <div className="mt-10 bg-slate-950 rounded-2xl border border-slate-700 p-6">
+<div className="mt-10 bg-slate-950 rounded-2xl border border-slate-700 p-6">
 
 <h2 className="text-2xl font-bold text-white mb-6">
   🚀 ApexCharts Preview
