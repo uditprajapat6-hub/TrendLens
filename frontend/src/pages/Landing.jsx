@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FiSearch, FiChevronDown } from 'react-icons/fi'
+import { useAuth } from '../context/AuthContext'
 import HeroChart from '../components/HeroChart'
 import TrendTicker from '../components/TrendTicker'
 import StatCard from '../components/StatCard'
@@ -26,6 +27,19 @@ function FaqItem({ q, a }) {
 
 export default function Landing() {
   const [query, setQuery] = useState('')
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  const handleAnalyze = (e) => {
+    e.preventDefault()
+    const target = query.trim() || 'electric vehicles'
+    localStorage.setItem('keyword', target)
+    if (isAuthenticated) {
+      navigate('/dashboard')
+    } else {
+      navigate('/login')
+    }
+  }
 
   return (
     <div>
@@ -49,7 +63,7 @@ export default function Landing() {
           </p>
 
           <form
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleAnalyze}
             className="mt-8 flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-darkmuted p-2 max-w-md"
           >
             <FiSearch className="ml-3 text-slate-400" />
@@ -59,9 +73,9 @@ export default function Landing() {
               placeholder="Try 'electric vehicles'"
               className="flex-1 bg-transparent px-1 py-2 text-sm outline-none"
             />
-            <Link to="/register" className="btn-primary !py-2 !px-5 text-sm whitespace-nowrap">
+            <button type="submit" className="btn-primary !py-2 !px-5 text-sm whitespace-nowrap">
               Analyze
-            </Link>
+            </button>
           </form>
 
           <div className="mt-8 grid grid-cols-3 gap-3 max-w-md">
@@ -107,7 +121,9 @@ export default function Landing() {
               Short, plain-language explainers on search volume, SEO fundamentals, and time-series
               reading — right next to the charts they explain.
             </p>
-            <Link to="/register" className="btn-secondary mt-6 inline-flex">Explore the Learning Hub</Link>
+            <Link to={isAuthenticated ? "/dashboard" : "/login"} className="btn-secondary mt-6 inline-flex">
+              Explore the Learning Hub
+            </Link>
           </div>
           <div id="games" className="glass-panel p-6">
             <h3 className="font-display font-semibold mb-4">Learn by playing</h3>

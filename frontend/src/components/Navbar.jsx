@@ -27,7 +27,9 @@ export default function Navbar() {
           <ThemeToggle />
           {isAuthenticated ? (
             <>
-              
+              <Link to="/dashboard" className="btn-secondary !px-5 !py-2 text-sm">
+                Dashboard
+              </Link>
               <button
                 onClick={() => { logout(); navigate('/') }}
                 className="btn-primary !px-5 !py-2 text-sm"
@@ -58,9 +60,21 @@ export default function Navbar() {
           <div className="flex items-center gap-3 pt-2">
             <ThemeToggle />
             {isAuthenticated ? (
-              <button onClick={() => { logout(); navigate('/'); setOpen(false) }} className="btn-primary flex-1 !py-2 text-sm">
-                Log out
-              </button>
+              <>
+                <Link
+                  to="/dashboard"
+                  className="btn-secondary flex-1 !py-2 text-sm text-center"
+                  onClick={() => setOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={() => { logout(); navigate('/'); setOpen(false) }}
+                  className="btn-primary flex-1 !py-2 text-sm"
+                >
+                  Log out
+                </button>
+              </>
             ) : (
               <>
                 <Link to="/login" className="btn-secondary flex-1 !py-2 text-sm" onClick={() => setOpen(false)}>Log in</Link>
