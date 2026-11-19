@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiTrendingUp } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
+import { parseApiError } from '../utils/errors'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -22,11 +23,7 @@ export default function Register() {
       await register(name, email, password)
       navigate('/dashboard')
     } catch (err) {
-      if (!err.response) {
-        setError('Unable to reach the server. It may be sleeping (Render Free Tier spins down after 15m) or offline. Please wait a moment and try again.')
-      } else {
-        setError(err.response?.data?.detail || 'Could not create account.')
-      }
+      setError(parseApiError(err, 'Could not create account.'))
     } finally {
       setSubmitting(false)
     }
@@ -71,8 +68,9 @@ export default function Register() {
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password (minimum 6 characters)"
             required
+            minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-lg border px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-400"

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiTrendingUp } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
+import { parseApiError } from '../utils/errors'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -19,11 +20,7 @@ export default function Login() {
       await login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      if (!err.response) {
-        setError('Unable to reach the server. It may be sleeping (Render Free Tier spins down after 15m) or offline. Please wait a moment and try again.')
-      } else {
-        setError(err.response?.data?.detail || 'Could not log in. Check your credentials.')
-      }
+      setError(parseApiError(err, 'Could not log in. Check your credentials.'))
     } finally {
       setSubmitting(false)
     }
