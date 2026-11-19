@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './routes/ProtectedRoute'
 import Compare from "./pages/Compare";
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/compare" element={<Compare />} />
                   <Route path="/regions" element={<Regions />} />
                   <Route path="/settings" element={<Settings />} />

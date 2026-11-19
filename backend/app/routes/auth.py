@@ -20,6 +20,7 @@ from app.schemas.auth import (
     UserPublic,
     ChangePasswordRequest,
     UpdateProfileRequest,
+    ResetPasswordRequest,
 )
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -71,6 +72,32 @@ async def login(payload: LoginRequest):
         access_token=create_access_token(user_id),
         refresh_token=create_refresh_token(user_id),
     )
+
+
+@router.post("/reset-password")
+async def reset_password(payload: ResetPasswordRequest):
+    db = get_database()
+    try:
+        user = await db.users.find_one({"email": payload.email.lower()})
+    except PyMongoError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database connection error. Please verify your MONGO_URI.",
+        )
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No account found with this email address",
+        )
+
+    new_hashed = hash_password(payload.newPassword)
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"hashed_password": new_hashed}},
+    )
+
+    return {"message": "Password reset successfully. You can now log in."}
 
 
 @router.get("/me", response_model=UserPublic)

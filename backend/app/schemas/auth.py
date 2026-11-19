@@ -40,11 +40,9 @@ class ChangePasswordRequest(BaseModel):
     newPassword: str
 
 
-class UpdateProfileRequest(BaseModel):
-    name: str
+class ResetPasswordRequest(BaseModel):
     email: EmailStr
-
-from pydantic import BaseModel, EmailStr
+    newPassword: str = Field(min_length=6, max_length=128)
 
 
 class UpdateProfileRequest(BaseModel):
