@@ -54,6 +54,16 @@ app.include_router(auth.router)
 app.include_router(dashboard.router)
 
 
+@app.get("/", tags=["root"])
+async def root():
+    return {
+        "status": "online",
+        "message": "TrendLens API is running successfully!",
+        "docs": "/docs",
+        "health": "/api/health",
+    }
+
+
 @app.get("/api/health", tags=["health"])
 async def health_check():
     return {"status": "ok", "environment": settings.environment}
